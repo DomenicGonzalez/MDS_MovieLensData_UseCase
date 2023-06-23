@@ -1,0 +1,542 @@
+//Best rated movies
+[
+  {
+    $unwind: "$ratings",
+  },
+  {
+    $group: {
+      _id: "$movieId",
+      title: {
+        $last: "$title",
+      },
+      year: {
+        $last: "$year",
+      },
+      AVG_Rating: {
+        $avg: "$ratings.rating",
+      },
+      Number_Of_Ratings: {
+        $count: {},
+      },
+    },
+  },
+  {
+    $sort: {
+      AVG_Rating: -1,
+      Number_Of_Ratings: -1,
+    },
+  },
+]
+
+
+//Most popular movies of a genre (e.g.: Thriller)
+
+[ 
+
+  { 
+
+    $unwind: "$ratings", 
+
+  }, 
+
+  { 
+
+    $match: { 
+
+      genre: "Thriller", 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $group: { 
+
+      _id: "$movieId", 
+
+      title: { 
+
+        $last: "$title", 
+
+      }, 
+
+      year: { 
+
+        $last: "$year", 
+
+      }, 
+
+      AVG_Rating: { 
+
+        $avg: "$ratings.rating", 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $sort: { 
+
+      AVG_Rating: -1, 
+
+    }, 
+
+  }, 
+
+]
+
+ 
+
+//Best rated movies of a user (e.g.: User 1)
+
+[ 
+
+  { 
+
+    $unwind: "$ratings", 
+
+  }, 
+
+  { 
+
+    $match: { 
+
+      "ratings.userId": 1, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $group: { 
+
+      _id: "$movieId", 
+
+      title: { 
+
+        $last: "$title", 
+
+      }, 
+
+      year: { 
+
+        $last: "$year", 
+
+      }, 
+
+      rating: { 
+
+        $last: "$ratings.rating", 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $sort: { 
+
+      rating: -1, 
+
+    }, 
+
+  }, 
+
+] 
+
+ 
+
+//All movies rated better than 4
+
+[ 
+
+  { 
+
+    $unwind: "$ratings", 
+
+  }, 
+
+  { 
+
+    $group: { 
+
+      _id: "$movieId", 
+
+      title: { 
+
+        $last: "$title", 
+
+      }, 
+
+      AVG_Rating: { 
+
+        $avg: "$ratings.rating", 
+
+      }, 
+
+    }, 
+
+  }, 
+
+      { 
+
+    $sort: { 
+
+      AVG_Rating: -1, 
+
+      Number_Of_Ratings: -1, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $project: { 
+
+      title: "$title", 
+
+      rating: "$AVG_Rating", 
+
+      ratinggt4: { 
+
+        $gt: ["$AVG_Rating", 4], 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $match: { 
+
+      ratinggt4: true, 
+
+    }, 
+
+  }, 
+
+] 
+
+ 
+
+//Movie recommendations to a user assuming that the user has watched the movie with the Movie_id = 3000 and that this movie belongs to the genre Drama
+
+[ 
+
+  { 
+
+    $unwind: "$ratings", 
+
+  }, 
+
+  { 
+
+    $match: { 
+
+      genre: "Drama", 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $group: { 
+
+      _id: "$movieId", 
+
+      title: { 
+
+        $last: "$title", 
+
+      }, 
+
+      genre: { 
+
+        $last: "$genre", 
+
+      }, 
+
+      AVG_Rating: { 
+
+        $avg: "$ratings.rating", 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $sort: { 
+
+      AVG_Rating: -1, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $project: { 
+
+      title: "$title", 
+
+      rating: "$AVG_Rating", 
+
+      genre: "$genre", 
+
+      ratinggt4: { 
+
+        $gt: ["$AVG_Rating", 4], 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $match: { 
+
+      ratinggt4: true, 
+
+      notEqualid3000: { 
+
+        $ne: ["$movieId", 3000], 
+
+      }, 
+
+    }, 
+
+  }, 
+
+] 
+
+ 
+
+//All movies rated better than 4 for a genre (e.g.: Comedy)
+
+[ 
+
+  { 
+
+    $unwind: "$ratings", 
+
+  }, 
+
+  { 
+
+    $match: { 
+
+      genre: "Comedy", 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $group: { 
+
+      _id: "$movieId", 
+
+      title: { 
+
+        $last: "$title", 
+
+      }, 
+
+      genre: { 
+
+        $last: "$genre", 
+
+      }, 
+
+      AVG_Rating: { 
+
+        $avg: "$ratings.rating", 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $sort: { 
+
+      AVG_Rating: -1, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $project: { 
+
+      title: "$title", 
+
+      rating: "$AVG_Rating", 
+
+      genre: "$genre", 
+
+      ratinggt4: { 
+
+        $gt: ["$AVG_Rating", 4], 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $match: { 
+
+      ratinggt4: true 
+
+    }, 
+
+  }, 
+
+] 
+
+ 
+
+//Most awarded tags
+
+[ 
+
+  { 
+
+    $unwind:"$tags", 
+
+  }, 
+
+  { 
+
+    $group: { 
+
+      _id: "$tags.tag", 
+
+      Number_Of_Tags: { 
+
+        $count: {}, 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $sort: { 
+
+      Number_Of_Tags: -1, 
+
+    }, 
+
+  }, 
+
+] 
+
+ 
+
+//Movie with the most tags
+
+[ 
+
+  { 
+
+    $unwind: "$tags", 
+
+  }, 
+
+  { 
+
+    $group: { 
+
+      _id: "$movieId", 
+
+      title: { 
+
+        $last: "$title", 
+
+      }, 
+
+      Number_Of_Tags: { 
+
+        $count: {}, 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $sort: { 
+
+      Number_Of_Tags: -1, 
+
+    }, 
+
+  }, 
+
+] 
+
+//Movie with the most tags in the different years
+
+[ 
+
+  { 
+
+    $unwind: "$tags", 
+
+  }, 
+
+  { 
+
+    $group: { 
+
+      _id: "$year", 
+
+      Number_Of_Tags: { 
+
+        $count: {}, 
+
+      }, 
+
+    }, 
+
+  }, 
+
+  { 
+
+    $sort: { 
+
+      year: -1, 
+
+    }, 
+
+  }, 
+
+] 
