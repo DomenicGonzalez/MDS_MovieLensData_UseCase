@@ -1,6 +1,9 @@
 # MDS_MovieLensData_UseCase
 This repository contains the data and the code that was used to build the use case in Oracle and MongoDB. 
 
+#### Paper
+- The 'MDS_Paper.pdf' file contains the paper with the description, explanations and results of the use case.
+
 #### Data
 - The 'MovieLensData' folder contains all the CSV-files with the data used in our use case
 
